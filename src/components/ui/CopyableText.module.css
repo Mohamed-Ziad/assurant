@@ -1,0 +1,41 @@
+.copyable {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0 3px;
+  margin: 0 -3px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.copyable:hover {
+  background: #f3f4f6;
+}
+
+.copyable:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+.copied {
+  color: #15803d;
+}
+
+.icon {
+  display: inline-flex;
+  color: #6b7280;
+  opacity: 0.6;
+}
+
+.copyable:hover .icon,
+.copied .icon {
+  opacity: 1;
+}
+
+.copied .icon {
+  color: #15803d;
+}

@@ -1,15 +1,11 @@
-"use client";
+import UuidLookupCard from "@/features/uuid-lookup/UuidLookupCard";
 
-import { Table } from "react-bootstrap";
-import CopyText from "../TextCopy";
-import UuidLookup from "./UUIDClient";
-
-export default function HaylaSystem() {
+export default function UuidPage() {
   return (
-    <>
-      <div className="row">
-        <div className="col-md-4"><UuidLookup /></div>
+    <div className="row">
+      <div className="col-md-4">
+        <UuidLookupCard />
       </div>
-    </>
+    </div>
   );
 }
