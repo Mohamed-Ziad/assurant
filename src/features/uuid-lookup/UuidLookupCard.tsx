@@ -3,13 +3,25 @@
 import { useState, type FormEvent } from "react";
 import { Button, Card, Form, Table } from "react-bootstrap";
 import CopyableText from "@/components/ui/CopyableText";
-import { UUID_DETAILS } from "./uuidDetails";
+import { useClipboard } from "@/hooks/useClipboard";
+import { findUuidDetails, TRACKING_DETAIL_LABEL, type UuidDetail } from "./uuidDetails";
 
 export default function UuidLookupCard() {
   const [uuid, setUuid] = useState("");
+  const [details, setDetails] = useState<UuidDetail[]>([]);
+  const { copy } = useClipboard();
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const searchedUuid = uuid.trim();
+    if (!searchedUuid) return;
+
+    const foundDetails = findUuidDetails(searchedUuid);
+    setDetails(foundDetails);
+
+    const trackingDetail = foundDetails.find(({ label }) => label === TRACKING_DETAIL_LABEL);
+    if (trackingDetail) await copy(trackingDetail.value, trackingDetail.label);
   };
 
   return (
@@ -29,20 +41,22 @@ export default function UuidLookupCard() {
           </Button>
         </Form>
 
-        <Table className="mt-4 mb-0 align-middle">
-          <tbody>
-            {UUID_DETAILS.map(({ label, value }) => (
-              <tr key={label}>
-                <td className="text-secondary fw-semibold small ps-0" style={{ width: "35%" }}>
-                  {label}
-                </td>
-                <td className="font-monospace">
-                  <CopyableText text={value} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        {details.length > 0 && (
+          <Table className="mt-4 mb-0 align-middle">
+            <tbody>
+              {details.map(({ label, value }) => (
+                <tr key={label}>
+                  <td className="text-secondary fw-semibold small ps-0" style={{ width: "35%" }}>
+                    {label}
+                  </td>
+                  <td className="font-monospace">
+                    <CopyableText text={value} label={label} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
       </Card.Body>
     </Card>
   );

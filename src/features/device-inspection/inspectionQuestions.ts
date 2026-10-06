@@ -18,8 +18,11 @@ export const ANSWER_TONES: Record<AnswerTone, { color: string; icon: string; nam
   unverified: { color: COLORS.gray600, icon: "?", name: "Unverified" },
 };
 
+/** The answer every question starts with. It does not count as an answer. */
+export const UNVERIFIED_ANSWER = "unverified";
+
 const UNVERIFIED_OPTION: AnswerOption = {
-  value: "unverified",
+  value: UNVERIFIED_ANSWER,
   label: "Unverified",
   tone: "unverified",
 };

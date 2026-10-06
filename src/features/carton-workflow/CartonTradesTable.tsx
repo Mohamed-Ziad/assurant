@@ -33,7 +33,7 @@ export default function CartonTradesTable({
       <Card.Body className="p-4">
         <div className="d-flex align-items-baseline gap-2 mb-3">
           <h4 className="fw-bold mb-0">Trades in Carton</h4>
-          <CopyableText text={carton.id} monospace className="text-secondary" />
+          <CopyableText text={carton.id} label="Carton ID" monospace className="text-secondary" />
         </div>
 
         <div className="table-responsive">
@@ -58,7 +58,7 @@ export default function CartonTradesTable({
 
                   <Cell>
                     <div className="fw-semibold text-nowrap">
-                      <CopyableText text={trade.model} bold />
+                      <CopyableText text={trade.model} label="Model" isIdentifier={false} bold />
                     </div>
                     <div className="small text-secondary text-nowrap">
                       <span className="font-monospace">{trade.modelCode}</span> · {trade.storage} ·{" "}
@@ -67,11 +67,11 @@ export default function CartonTradesTable({
                   </Cell>
 
                   <Cell className="font-monospace text-nowrap">
-                    <CopyableText text={trade.itemNumber} />
+                    <CopyableText text={trade.itemNumber} label="Item number" />
                   </Cell>
 
                   <Cell className="font-monospace text-nowrap">
-                    <CopyableText text={trade.imei} />
+                    <CopyableText text={trade.imei} label="IMEI number" />
                   </Cell>
 
                   <Cell className="font-monospace text-secondary">{trade.tradeInDate}</Cell>

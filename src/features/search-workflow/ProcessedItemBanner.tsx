@@ -1,43 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { CloseButton } from "react-bootstrap";
-import IconButton from "@/components/ui/IconButton";
-import StatusBanner from "@/components/ui/StatusBanner";
-import { COLORS } from "@/constants/colors";
-import { useClipboard } from "@/hooks/useClipboard";
+import { Alert } from "react-bootstrap";
+import CopyableText from "@/components/ui/CopyableText";
 
-const COPY_KEY = "item-number";
+interface ProcessedItemBannerProps {
+  itemNumber: string;
+  onClose: () => void;
+}
 
-/** Tells the technician that an item was processed. It can be copied and dismissed. */
-export default function ProcessedItemBanner({ itemNumber }: { itemNumber: string }) {
-  const [isDismissed, setIsDismissed] = useState(false);
-  const { copiedKey, copy } = useClipboard();
-
-  if (isDismissed) return null;
-
+/** A green alert at the top of a form card. It tells the technician which item was processed. */
+export default function ProcessedItemBanner({ itemNumber, onClose }: ProcessedItemBannerProps) {
   return (
-    <StatusBanner
-      tone="success"
-      trailing={
-        <>
-          <IconButton
-            icon={copiedKey === COPY_KEY ? "check" : "copy"}
-            label="Copy item number"
-            color={COLORS.success}
-            onClick={() => copy(itemNumber, COPY_KEY)}
-          />
-          <CloseButton
-            className="ms-auto"
-            aria-label="Close"
-            onClick={() => setIsDismissed(true)}
-          />
-        </>
-      }
-    >
-      <span>
-        Item <span className="font-monospace fw-bold">{itemNumber}</span> has been processed
-      </span>
-    </StatusBanner>
+    <Alert variant="success" dismissible onClose={onClose} className="rounded-0 border-0 mb-0 py-2">
+      Item <CopyableText text={itemNumber} label="Item number" monospace bold /> has been processed
+    </Alert>
   );
 }

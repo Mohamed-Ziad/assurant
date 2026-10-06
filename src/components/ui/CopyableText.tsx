@@ -6,11 +6,13 @@ import { classNames } from "@/utils/classNames";
 import Icon from "./Icon";
 import styles from "./CopyableText.module.css";
 
-const COPY_KEY = "text";
-
 interface CopyableTextProps {
   /** The value placed on the clipboard. */
   text: string;
+  /** What the value is, for the "copied" message. For example "Item number". */
+  label: string;
+  /** Set to false for text that is not an ID, such as a model name. The message then has no "#". */
+  isIdentifier?: boolean;
   /** What to show instead of `text`, when it should look different from what is copied. */
   children?: ReactNode;
   bold?: boolean;
@@ -23,12 +25,14 @@ interface CopyableTextProps {
 /**
  * Text that is copied to the clipboard when clicked.
  *
- * <CopyableText text="123456789123456" monospace />
- * <CopyableText text="iPhone 15 Pro" bold />
- * <CopyableText text="927468125">Item 927468125</CopyableText>
+ * <CopyableText text="123456789123456" label="IMEI number" monospace />
+ * <CopyableText text="iPhone 15 Pro" label="Model" isIdentifier={false} bold />
+ * <CopyableText text="927468125" label="Item number">Item 927468125</CopyableText>
  */
 export default function CopyableText({
   text,
+  label,
+  isIdentifier = true,
   children,
   bold = false,
   monospace = false,
@@ -36,13 +40,12 @@ export default function CopyableText({
   className,
   style,
 }: CopyableTextProps) {
-  const { copiedKey, copy } = useClipboard();
-  const isCopied = copiedKey === COPY_KEY;
+  const { isCopied, copy } = useClipboard();
 
   return (
     <button
       type="button"
-      onClick={() => copy(text, COPY_KEY)}
+      onClick={() => copy(text, label, isIdentifier)}
       title={isCopied ? "Copied" : "Click to copy"}
       className={classNames(
         styles.copyable,

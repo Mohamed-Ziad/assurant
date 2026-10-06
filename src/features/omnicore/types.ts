@@ -1,4 +1,3 @@
-import type { BannerTone } from "@/components/ui/StatusBanner";
 import type { StatusTone } from "@/components/ui/StatusGlyph";
 
 /** A step that shows a value, such as "OK" or a software version. */
@@ -13,20 +12,46 @@ export interface ValueStep {
 export interface ActionStep {
   label: string;
   action: "print";
+  isDisabled: boolean;
 }
 
-export type StationStep = ValueStep | ActionStep;
+/** A step where the technician types a number or picks an option, then confirms to continue. */
+interface NumberInputStep {
+  label: string;
+  input: "number";
+  digits: number;
+  onConfirm: (value: string) => void;
+}
 
-export interface Station {
+interface SelectInputStep {
+  label: string;
+  input: "select";
+  options: string[];
+  onConfirm: (value: string) => void;
+}
+
+export type InputStep = NumberInputStep | SelectInputStep;
+
+export type StationStep = ValueStep | ActionStep | InputStep;
+
+/** Running: a step loads. Waiting: the technician must confirm a step. */
+export type StationState = "running" | "waiting" | "success" | "failed";
+
+/** The phone in a station, and the values its steps show. */
+export interface StationDevice {
   slot: string;
   operatingSystem: string;
   model: string;
   modelCode: string;
   storage: string;
   serialNumber: string;
-  /** Steps shown in rows of five. */
+  /** Values shown by steps, by step label. For example the device color or the scanned item. */
+  readings: Record<string, string>;
+}
+
+export interface Station extends Omit<StationDevice, "readings"> {
+  /** Shown in rows of five, the last row centered. */
   steps: StationStep[];
-  /** Steps shown centered in the last row. */
-  finalSteps: StationStep[];
-  status: { tone: BannerTone; message: string };
+  state: StationState;
+  message: string;
 }

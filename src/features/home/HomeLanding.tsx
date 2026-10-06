@@ -1,6 +1,6 @@
 "use client";
 
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import SectionHeading from "@/components/ui/SectionHeading";
 import HeroSection from "./HeroSection";
 import { PAGE_SUMMARIES, STUDY_FILES, STUDY_SECTION_ID } from "./homeContent";
@@ -10,7 +10,7 @@ import StudyFileCard from "./StudyFileCard";
 
 export default function HomeLanding() {
   return (
-    <Container className="py-5" style={{ maxWidth: 1100 }}>
+    <div className="mx-auto py-3" style={{ maxWidth: 1100 }}>
       <HeroSection />
       <PrincipleList />
 
@@ -41,6 +41,6 @@ export default function HomeLanding() {
           </Col>
         ))}
       </Row>
-    </Container>
+    </div>
   );
 }

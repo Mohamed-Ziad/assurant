@@ -16,7 +16,7 @@ export default function FollowUpIssues({
   onToggle,
 }: FollowUpIssuesProps) {
   return (
-    <div className="mt-3 p-2 px-3 rounded border border-danger-subtle bg-danger-subtle">
+    <div className="mt-2 p-2 px-3 rounded border border-danger-subtle bg-danger-subtle">
       <div className="text-danger text-uppercase fw-semibold small mb-1">{followUp.label}</div>
 
       {followUp.items.map((item) => (

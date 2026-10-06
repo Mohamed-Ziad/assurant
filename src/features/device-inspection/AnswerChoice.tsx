@@ -32,7 +32,7 @@ export default function AnswerChoice({
       />
       <label
         htmlFor={inputId}
-        className="btn btn-sm fw-semibold px-3 border-2"
+        className="btn btn-sm fw-semibold px-2 border-2"
         style={
           isSelected
             ? { background: color, borderColor: color, color: COLORS.white }

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Formik, Form as FormikForm } from "formik";
-import { Button, ButtonGroup, Card, Container, ProgressBar } from "react-bootstrap";
+import { Button, ButtonGroup, Card, ProgressBar } from "react-bootstrap";
 import { COLORS } from "@/constants/colors";
 import { getFieldErrorMessage } from "@/utils/formErrors";
 import { showSuccessToast } from "@/utils/toast";
@@ -21,6 +21,7 @@ import {
   getListValue,
   getQuestionsForMode,
   getTextValue,
+  isAnswered,
 } from "./inspectionForm";
 import { ANSWER_TONES, DEVICE_COLOR_FIELD, INSPECTION_MODES } from "./inspectionQuestions";
 import type { InspectionFormValues, InspectionMode, InspectionSubmission } from "./types";
@@ -40,12 +41,9 @@ export default function DeviceInspectionForm({
   const validationSchema = useMemo(() => buildValidationSchema(questions), [questions]);
 
   return (
-    <Container className="pt-4" style={{ maxWidth: 900, paddingBottom: 100 }}>
-      <div className="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
-        <div>
-          <div className="text-uppercase text-muted fw-semibold small">Inspection</div>
-          <h4 className="fw-bold mb-0">Device Check</h4>
-        </div>
+    <div>
+      <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <h4 className="fw-bold mb-0">Device Check</h4>
 
         <ButtonGroup size="sm">
           {INSPECTION_MODES.map((inspectionMode) => (
@@ -76,16 +74,15 @@ export default function DeviceInspectionForm({
         }}
       >
         {({ values, errors, submitCount, setFieldValue }) => {
-          const shouldShowErrors = submitCount > 0;
           const errorMessageOf = (fieldName: string) =>
-            shouldShowErrors ? getFieldErrorMessage(errors, fieldName) : undefined;
+            submitCount > 0 ? getFieldErrorMessage(errors, fieldName) : undefined;
 
           const totalFieldCount = questions.length + 1;
           const answeredCount = countAnsweredFields(questions, values);
 
           return (
             <FormikForm noValidate>
-              <div className="d-flex align-items-center gap-3 mb-3">
+              <div className="d-flex align-items-center gap-3 mb-2">
                 <ProgressBar
                   now={(answeredCount / totalFieldCount) * 100}
                   className="flex-grow-1"
@@ -99,25 +96,31 @@ export default function DeviceInspectionForm({
               <Card className="shadow-sm overflow-hidden">
                 {questions.map((question, index) => {
                   const answerTone = getAnswerTone(question, values);
-                  const errorMessage = errorMessageOf(question.id);
                   const { followUp } = question;
+                  const followUpError = followUp ? errorMessageOf(followUp.fieldName) : undefined;
 
                   return (
                     <InspectionRow
                       key={question.id}
                       number={index + 1}
-                      isAnswered={Boolean(answerTone)}
+                      isAnswered={isAnswered(question, values)}
                       accentColor={
-                        errorMessage ? COLORS.danger : answerTone && ANSWER_TONES[answerTone].color
+                        followUpError
+                          ? COLORS.danger
+                          : answerTone && isAnswered(question, values)
+                            ? ANSWER_TONES[answerTone].color
+                            : undefined
                       }
-                      hasError={Boolean(errorMessage)}
+                      hasError={Boolean(followUpError)}
                     >
-                      <div className="fw-bold">{question.title}</div>
-                      {question.subtitle && (
-                        <div className="text-muted small">{question.subtitle}</div>
-                      )}
+                      <div>
+                        <span className="fw-semibold">{question.title}</span>
+                        {question.subtitle && (
+                          <span className="text-muted small ms-2">{question.subtitle}</span>
+                        )}
+                      </div>
 
-                      <div className="d-flex flex-wrap gap-2 mt-2">
+                      <div className="d-flex flex-wrap gap-1 mt-1">
                         {question.options.map((option) => (
                           <AnswerChoice
                             key={option.value}
@@ -138,7 +141,7 @@ export default function DeviceInspectionForm({
                         <FollowUpIssues
                           followUp={followUp}
                           selectedValues={getListValue(values, followUp.fieldName)}
-                          errorMessage={errorMessageOf(followUp.fieldName)}
+                          errorMessage={followUpError}
                           onToggle={(value, isChecked) => {
                             const selectedValues = getListValue(values, followUp.fieldName);
                             setFieldValue(
@@ -150,10 +153,6 @@ export default function DeviceInspectionForm({
                           }}
                         />
                       )}
-
-                      {errorMessage && (
-                        <div className="text-danger small fw-semibold mt-2">✕ {errorMessage}</div>
-                      )}
                     </InspectionRow>
                   );
                 })}
@@ -164,16 +163,16 @@ export default function DeviceInspectionForm({
                   errorMessage={errorMessageOf(DEVICE_COLOR_FIELD)}
                   onChange={(color) => setFieldValue(DEVICE_COLOR_FIELD, color)}
                 />
-              </Card>
 
-              <InspectionSummaryBar
-                answeredCount={answeredCount}
-                countsByTone={countAnswersByTone(questions, values)}
-              />
+                <InspectionSummaryBar
+                  answeredCount={answeredCount}
+                  countsByTone={countAnswersByTone(questions, values)}
+                />
+              </Card>
             </FormikForm>
           );
         }}
       </Formik>
-    </Container>
+    </div>
   );
 }

@@ -7,14 +7,12 @@ export default function ItemWorkflowPage() {
     <>
       <StopwatchTimer />
 
-      <div className="container-fluid mt-4">
-        <div className="row">
-          <div className="col-md-4">
-            <ItemWorkflowForm />
-          </div>
-          <div className="col-md-5 offset-md-3">
-            <DeviceInspectionForm defaultMode="NTO" />
-          </div>
+      <div className="row">
+        <div className="col-lg-4">
+          <ItemWorkflowForm />
+        </div>
+        <div className="col-lg-7">
+          <DeviceInspectionForm defaultMode="NTO" />
         </div>
       </div>
     </>

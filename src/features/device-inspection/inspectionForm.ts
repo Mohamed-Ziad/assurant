@@ -3,6 +3,7 @@ import {
   DEVICE_COLOR_FIELD,
   INSPECTION_QUESTIONS,
   QUESTION_IDS_BY_MODE,
+  UNVERIFIED_ANSWER,
 } from "./inspectionQuestions";
 import type { AnswerTone, InspectionFormValues, InspectionMode, InspectionQuestion } from "./types";
 
@@ -27,21 +28,20 @@ export function buildInitialValues(questions: InspectionQuestion[]): InspectionF
   const values: InspectionFormValues = { [DEVICE_COLOR_FIELD]: "" };
 
   for (const question of questions) {
-    values[question.id] = "";
+    values[question.id] = UNVERIFIED_ANSWER;
     if (question.followUp) values[question.followUp.fieldName] = [];
   }
 
   return values;
 }
 
+/** Every question starts answered, so only the color and the follow-up issues need checking. */
 export function buildValidationSchema(questions: InspectionQuestion[]) {
   const shape: Record<string, Yup.Schema> = {
     [DEVICE_COLOR_FIELD]: Yup.string().required("Pick a color"),
   };
 
   for (const question of questions) {
-    shape[question.id] = Yup.string().required("Pick an answer");
-
     if (question.followUp) {
       shape[question.followUp.fieldName] = Yup.array().when(question.id, {
         is: question.followUp.triggerValue,
@@ -66,13 +66,19 @@ export function getListValue(values: InspectionFormValues, fieldName: string): s
   return Array.isArray(value) ? value : [];
 }
 
-/** The tone of the answer picked for a question, or `undefined` when it is not answered yet. */
+/** The tone of the answer picked for a question. */
 export function getAnswerTone(
   question: InspectionQuestion,
   values: InspectionFormValues,
 ): AnswerTone | undefined {
   const answer = getTextValue(values, question.id);
   return question.options.find((option) => option.value === answer)?.tone;
+}
+
+/** A question counts as answered once the technician picks something other than "Unverified". */
+export function isAnswered(question: InspectionQuestion, values: InspectionFormValues): boolean {
+  const tone = getAnswerTone(question, values);
+  return tone !== undefined && tone !== "unverified";
 }
 
 export function countAnswersByTone(
@@ -83,7 +89,7 @@ export function countAnswersByTone(
 
   for (const question of questions) {
     const tone = getAnswerTone(question, values);
-    if (tone) counts[tone] += 1;
+    if (tone && isAnswered(question, values)) counts[tone] += 1;
   }
 
   return counts;
@@ -93,9 +99,7 @@ export function countAnsweredFields(
   questions: InspectionQuestion[],
   values: InspectionFormValues,
 ): number {
-  const answeredQuestions = questions.filter((question) =>
-    getTextValue(values, question.id),
-  ).length;
+  const answeredQuestions = questions.filter((question) => isAnswered(question, values)).length;
   const hasColor = getTextValue(values, DEVICE_COLOR_FIELD) ? 1 : 0;
   return answeredQuestions + hasColor;
 }

@@ -1,11 +1,11 @@
 import * as Yup from "yup";
 import type { SearchFieldConfig } from "./types";
 
-const ITEM_NUMBER_LENGTH = 9;
+export const ITEM_NUMBER_LENGTH = 9;
 
 export const ITEM_NUMBER_FIELD: SearchFieldConfig = {
   name: "item",
-  label: "Item Number",
+  label: "Item number",
   placeholder: "927468125",
   digitsOnly: true,
   maxLength: ITEM_NUMBER_LENGTH,

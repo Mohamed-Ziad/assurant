@@ -27,7 +27,7 @@ export default function DeviceColorRow({
       hasError={Boolean(errorMessage)}
       isLast
     >
-      <Form.Label htmlFor="color" className="fw-bold mb-2">
+      <Form.Label htmlFor="color" className="fw-semibold mb-1">
         Device color
       </Form.Label>
 

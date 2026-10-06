@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { classNames } from "@/utils/classNames";
 
-const NUMBER_BADGE_SIZE = 26;
+const NUMBER_BADGE_SIZE = 22;
 
 interface InspectionRowProps {
   /** Position of the row in the form, starting at 1. */
@@ -27,7 +27,7 @@ export default function InspectionRow({
   return (
     <div
       className={classNames(
-        "d-flex gap-3 px-3 py-3",
+        "d-flex gap-2 px-3 py-2",
         !isLast && "border-bottom",
         hasError && "bg-danger-subtle",
       )}
@@ -35,10 +35,10 @@ export default function InspectionRow({
     >
       <span
         className={classNames(
-          "rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 small fw-bold",
+          "rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 fw-bold",
           isAnswered ? "bg-dark text-white" : "bg-light text-muted",
         )}
-        style={{ width: NUMBER_BADGE_SIZE, height: NUMBER_BADGE_SIZE }}
+        style={{ width: NUMBER_BADGE_SIZE, height: NUMBER_BADGE_SIZE, fontSize: 12 }}
       >
         {number}
       </span>

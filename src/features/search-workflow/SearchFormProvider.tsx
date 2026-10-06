@@ -4,12 +4,13 @@ import { useMemo, type ReactNode } from "react";
 import { Formik } from "formik";
 import type * as Yup from "yup";
 import { requireAtLeastOneField } from "@/utils/formErrors";
-import type { SearchFieldConfig, SearchFormHandler, SearchFormValues } from "./types";
+import type { SearchFieldConfig, SearchFormValues, SearchHandler } from "./types";
 
 export interface SearchFormProviderProps {
   fields: SearchFieldConfig[];
   validationSchema: Yup.AnyObjectSchema;
-  onSearch?: SearchFormHandler;
+  /** Runs when the form is submitted. Field values it returns are filled into the form. */
+  onSearch?: SearchHandler;
   children: ReactNode;
 }
 
@@ -33,9 +34,12 @@ export default function SearchFormProvider({
       initialValues={initialValues}
       validationSchema={validationSchema}
       validate={requireAtLeastOneField}
-      onSubmit={(values, { setSubmitting }) => {
-        onSearch?.(values);
-        setSubmitting(false);
+      onSubmit={async (values, { setFieldValue }) => {
+        const filledValues = (await onSearch?.(values)) ?? {};
+
+        for (const [fieldName, value] of Object.entries(filledValues)) {
+          if (value !== undefined) await setFieldValue(fieldName, value);
+        }
       }}
     >
       {() => children}

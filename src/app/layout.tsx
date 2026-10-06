@@ -26,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <AppNavbar />
-        {children}
+        <main className="container-fluid px-4 py-4">{children}</main>
       </body>
     </html>
   );

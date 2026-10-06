@@ -11,3 +11,8 @@ export interface SearchFieldConfig extends SanitizeRules {
 export type SearchFormValues = Record<string, string>;
 
 export type SearchFormHandler = (values: SearchFormValues) => void;
+
+/** Field values that the form fills in after a search. */
+export type SearchResult = Partial<SearchFormValues> | void;
+
+export type SearchHandler = (values: SearchFormValues) => Promise<SearchResult> | SearchResult;

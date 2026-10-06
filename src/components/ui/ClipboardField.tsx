@@ -16,6 +16,8 @@ interface ClipboardFieldProps {
   /** Cleans typed and pasted text before it reaches `onValueChange`. */
   sanitize?: (rawValue: string) => string;
   onValueChange: (value: string) => void;
+  /** Called with the cleaned text after the user pastes into the field, by button or keyboard. */
+  onPasted?: (pastedValue: string) => void;
 }
 
 const keepValueAsIs = (rawValue: string) => rawValue;
@@ -30,12 +32,20 @@ export default function ClipboardField({
   errorMessage,
   sanitize = keepValueAsIs,
   onValueChange,
+  onPasted,
 }: ClipboardFieldProps) {
-  const { copiedKey, copy, paste } = useClipboard();
+  const { isCopied, copy, paste } = useClipboard();
 
-  const pasteIntoField = async () => {
+  /** A paste replaces the whole value, like the Paste button does. */
+  const applyPastedText = (pastedText: string) => {
+    const pastedValue = sanitize(pastedText);
+    onValueChange(pastedValue);
+    onPasted?.(pastedValue);
+  };
+
+  const pasteFromButton = async () => {
     const clipboardText = await paste();
-    if (clipboardText !== null) onValueChange(sanitize(clipboardText));
+    if (clipboardText !== null) applyPastedText(clipboardText);
   };
 
   return (
@@ -47,6 +57,10 @@ export default function ClipboardField({
           name={name}
           value={value}
           onChange={(event) => onValueChange(sanitize(event.target.value))}
+          onPaste={(event) => {
+            event.preventDefault();
+            applyPastedText(event.clipboardData.getData("text"));
+          }}
           placeholder={placeholder}
           inputMode={isNumeric ? "numeric" : "text"}
           autoComplete="off"
@@ -59,13 +73,13 @@ export default function ClipboardField({
           style={errorMessage ? { borderColor: COLORS.danger } : undefined}
         >
           <IconButton
-            icon={copiedKey === name ? "check" : "copy"}
+            icon={isCopied ? "check" : "copy"}
             label={`Copy ${label}`}
             disabled={!value}
-            onClick={() => copy(value, name)}
+            onClick={() => copy(value, label)}
           />
           <span className="vr my-1" />
-          <IconButton icon="paste" label={`Paste ${label}`} onClick={pasteIntoField} />
+          <IconButton icon="paste" label={`Paste ${label}`} onClick={pasteFromButton} />
         </InputGroup.Text>
       </InputGroup>
 

@@ -5,10 +5,7 @@ export default function CartonWorkflowPage() {
   return (
     <>
       <StopwatchTimer />
-
-      <div className="container-fluid mt-4">
-        <CartonWorkflowView />
-      </div>
+      <CartonWorkflowView />
     </>
   );
 }

@@ -11,7 +11,7 @@ const COLOR_SELECT_ID = "redesigned-device-color";
 /** The current inspection form next to the redesigned one, to compare them. */
 export default function PhoneCasesComparison() {
   return (
-    <div className="container">
+    <div>
       <StopwatchTimer />
 
       <div className="row">

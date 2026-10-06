@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Form as FormikForm, useFormikContext } from "formik";
 import { Button, Card } from "react-bootstrap";
 import ClipboardField from "@/components/ui/ClipboardField";
@@ -12,8 +13,11 @@ import type { SearchFieldConfig, SearchFormHandler, SearchFormValues } from "./t
 export interface SearchFormCardProps {
   title: string;
   fields: SearchFieldConfig[];
-  /** When set, a banner confirms that this item was processed. */
+  /** When set, a green alert at the top of the card says that this item was processed. */
   processedItem?: string;
+  onDismissProcessedItem?: () => void;
+  /** Name of a field that submits the form as soon as the technician pastes into it. */
+  submitOnPasteInto?: string;
   onRevert?: SearchFormHandler;
   onReinspect?: SearchFormHandler;
   onLookup?: SearchFormHandler;
@@ -27,19 +31,42 @@ export default function SearchFormCard({
   title,
   fields,
   processedItem,
+  onDismissProcessedItem,
+  submitOnPasteInto,
   onRevert,
   onReinspect,
   onLookup,
 }: SearchFormCardProps) {
-  const { values, errors, submitCount, setFieldValue, resetForm } =
+  const { values, errors, submitCount, setFieldValue, resetForm, submitForm } =
     useFormikContext<SearchFormValues>();
+
+  // A pasted value reaches the form on the next render, so the submit waits for it.
+  const shouldSubmitRef = useRef(false);
+
+  useEffect(() => {
+    if (!shouldSubmitRef.current) return;
+    shouldSubmitRef.current = false;
+    void submitForm();
+  }, [values, submitForm]);
+
+  const submitAfterPaste = (fieldName: string, pastedValue: string) => {
+    if (fieldName !== submitOnPasteInto || !pastedValue) return;
+
+    if (pastedValue === values[fieldName]) void submitForm();
+    else shouldSubmitRef.current = true;
+  };
 
   const shouldShowErrors = submitCount > 0;
   const formErrorMessage = getFieldErrorMessage(errors, FORM_ERROR_KEY);
 
   return (
     <Card className="shadow-sm overflow-hidden">
-      {processedItem && <ProcessedItemBanner itemNumber={processedItem} />}
+      {processedItem && (
+        <ProcessedItemBanner
+          itemNumber={processedItem}
+          onClose={() => onDismissProcessedItem?.()}
+        />
+      )}
 
       <Card.Body className="p-4">
         <h4 className="fw-bold mb-3">{title}</h4>
@@ -56,6 +83,7 @@ export default function SearchFormCard({
               errorMessage={shouldShowErrors ? getFieldErrorMessage(errors, field.name) : undefined}
               sanitize={(rawValue) => sanitizeFieldValue(rawValue, field)}
               onValueChange={(value) => setFieldValue(field.name, value)}
+              onPasted={(pastedValue) => submitAfterPaste(field.name, pastedValue)}
             />
           ))}
 

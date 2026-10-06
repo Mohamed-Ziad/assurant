@@ -1,13 +1,20 @@
+import { ALPHANUMERIC, mockText } from "@/utils/mockData";
+
 export interface UuidDetail {
   label: string;
   value: string;
 }
 
-export const UUID_DETAILS: UuidDetail[] = [
-  { label: "Tracking ID", value: "0120120120120120" },
-  { label: "CEII", value: "0120120120120120" },
-  { label: "IMEI", value: "0120120120120120" },
-  { label: "SH", value: "0120120120120120" },
-  { label: "Item Number", value: "0120120120120120" },
-  { label: "Order Number", value: "0120120120120120" },
-];
+export const TRACKING_DETAIL_LABEL = "Tracking number";
+
+/** The details of a UUID. Replace with the real API call. */
+export function findUuidDetails(uuid: string): UuidDetail[] {
+  return [
+    { label: TRACKING_DETAIL_LABEL, value: `1Z${mockText(`${uuid}-tracking`, 16, ALPHANUMERIC)}` },
+    { label: "CEII", value: mockText(`${uuid}-ceii`, 14) },
+    { label: "IMEI number", value: mockText(`${uuid}-imei`, 15) },
+    { label: "SH", value: mockText(`${uuid}-sh`, 10) },
+    { label: "Item number", value: mockText(`${uuid}-item`, 9) },
+    { label: "Order number", value: mockText(`${uuid}-order`, 10) },
+  ];
+}
